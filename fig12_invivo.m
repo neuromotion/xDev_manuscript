@@ -1,11 +1,11 @@
-%% fig10_invivo.m
+%% fig12_invivo.m
 % Author: Sam Parker
 % Date: 9/30/2024
 % (C) Brown Neuromotion Lab 2024
 %
 % PROVIDED WITHOUT WARRANTY OR GUARANTEE
 clear; close all; clc
-load("..\Data\Fig10_invivo.mat")
+load("data\Fig12_invivo.mat")
 
 %% Plot the EMG examples from the Intan chip
 figure()
