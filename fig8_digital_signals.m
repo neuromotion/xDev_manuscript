@@ -56,8 +56,8 @@ c = multcompare(stats, "Display","off");
 group_names = ["High", "Low", "Cross", "Control"];
 for i = 1:size(c, 1)
     if c(i, 6) <= 0.05
-        fprintf("%s is sig diff from %s!\n", group_names(c(i, 1)), group_names(c(i, 2)))
+        fprintf("%s is sig diff from %s! p = %e\n", group_names(c(i, 1)), group_names(c(i, 2)), c(i, 6))
     else
-        fprintf("%s not sig diff from %s.\n", group_names(c(i, 1)), group_names(c(i, 2)))
+        fprintf("%s not sig diff from %s. p = %f\n", group_names(c(i, 1)), group_names(c(i, 2)), c(i, 6))
     end
 end
