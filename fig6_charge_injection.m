@@ -62,7 +62,7 @@ set(gcf, "Position", [100, 100, 1310, 420])
 figure()
 yyaxis right;
 plot(charge_injection.artifact.Time_s * 1e6, charge_injection.artifact.PCLK_V, '-', "Color", "#000000");
-ylabel("Digital Voltage (V)")
+ylabel("PCLK Voltage (V)")
 yticks(0:2.5:5)
 yyaxis left;
 plot(charge_injection.artifact.Time_s * 1e6, charge_injection.artifact.X4_V * 1e6, "Color", "#33bbee");
