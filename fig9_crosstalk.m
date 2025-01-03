@@ -199,18 +199,20 @@ title("Square wave crosstalk artifact vs frequency")
 legend(strrep(frequencies, "f_", ""), "Location", "EastOutside")
 set(gcf, "Position", [61, 426, 706, 420])
 %% Filtering victim channel for 30kHz recording
-
+fc = 15e3;
 time_s = time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s - time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s(1);
 figure()
 tcl = tiledlayout(2, 1, "TileSpacing", "tight");
 nexttile()
-plot(time_s*1e6,              lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)))); hold on
+plot(time_s*1e6,              lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, fc, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)), "steepness", 0.95, "StopbandAttenuation", 60)); hold on
 plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch2_V);
 ylabel("Voltage (V)")
 ylim([-1.1, 1.1])
 yticks([-1:0.5:1])
+xlim([0, 200])
+xticks([0:50:200])
 nexttile()
-yyaxis left; plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V*1000, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)))); hold on
+yyaxis left; plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V*1000, fc, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)), "steepness", 0.95, "StopbandAttenuation", 60)); hold on
 ylabel("Filtered Victim (mV)")
 ylim([-50, 50])
 yticks([-50:25:50])
@@ -228,13 +230,15 @@ time_s = time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s - time_domain_
 figure()
 tcl = tiledlayout(2, 1, "TileSpacing", "tight");
 nexttile()
-plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)))); hold on
+plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, fc, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)), "steepness", 0.95, "StopbandAttenuation", 60)); hold on
 plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch2_V);
 ylabel("Voltage (V)")
 ylim([-1.1, 1.1])
 yticks([-1:0.5:1])
+xlim([0, 200])
+xticks([0:50:200])
 nexttile()
-yyaxis left; plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V*1000, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)))); hold on
+yyaxis left; plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V*1000, fc, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)), "steepness", 0.95, "StopbandAttenuation", 60)); hold on
 ylabel("Filtered Victim (mV)")
 yyaxis right; plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch2_V);
 ylim([-1.5, 1.5])
