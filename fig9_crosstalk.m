@@ -28,7 +28,7 @@ end
 crosstalk.output_rms_unamplified = crosstalk.output_rms_mean ./ crosstalk.amp_gain;
 
 %% Calculate crosstalk
-crosstalk.attentuation_dB = 20 * log10(crosstalk.input_rms_mean./ crosstalk.output_rms_unamplified );
+crosstalk.attentuation_dB = 20 * log10(crosstalk.input_rms_mean./ crosstalk.output_rms_unamplified);
 
 %% Plot gain vs aggressor frequency
 
