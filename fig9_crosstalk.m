@@ -174,6 +174,29 @@ end
 
 fprintf("Time constant for square wave transient artifact is %f microseconds\n", nanmean(tc) * 1e6)
 
+%% Overlay a single transient from each frequency to show consistency
+colors = ["#a9e6fe", "#91dcfa", "#78d2f6", "#5bc7f2", "#33bbee", "#299eca", "#1d80a5", "#116382", "#054861"];
+figure()
+for i = 1:length(frequencies)
+    this_frequency = split(frequencies(i), "f_"); this_frequency = this_frequency(2);
+    this_frequency = split(this_frequency, "Hz"); this_frequency = str2double(this_frequency(1));
+    
+    sign_agg = diff(sign(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch2_V));
+    first_pos = find(sign_agg == 2, 1);
+    sign_agg(1:(first_pos-1)) = 0;
+    agg_sign_flip_times = time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(find(sign_agg));
+    time = time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - agg_sign_flip_times(1);
+    bad_flip = agg_sign_flip_times(2) - agg_sign_flip_times(1);
+        plot(time(time <= 0)*1e6, time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V(time <= 0)*1e3, "Color", "#efefef", "HandleVisibility", "off"); hold on
+        plot(time(time >= 0 & time <= bad_flip)*1e6, time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V(time >= 0 & time <= bad_flip)*1e3, "Color", colors(i)); hold on
+        plot(time(time >= bad_flip)*1e6, time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V(time >= bad_flip)*1e3, "Color", "#efefef", "HandleVisibility", "off");
+end
+xlim([-5e-1, 25e-1])
+xlabel("Time (µs)")
+ylabel("Victim (mV)")
+title("Square wave crosstalk artifact vs frequency")
+legend(strrep(frequencies, "f_", ""), "Location", "EastOutside")
+set(gcf, "Position", [61, 426, 706, 420])
 %% Filtering victim channel for 30kHz recording
 
 figure()
