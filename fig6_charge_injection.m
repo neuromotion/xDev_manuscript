@@ -56,3 +56,14 @@ subtitle("Areas: MEA 200\mu{}m^2, EES 3.4mm^2, DBS 0.06cm^2")
 legend("Charge Injected", "DBS Damage Threshold", "MEA Damage Threshold", "EES Damage Threshold", "Location", "North")
 title(tcl, "Charge Injection")
 set(gcf, "Position", [100, 100, 1310, 420])
+
+%% Plot artifact on ephys channel
+
+figure()
+yyaxis right;
+plot(charge_injection.artifact.Time_s, charge_injection.artifact.PCLK_V, '-', "Color", "#000000");
+ylabel("Digital Voltage (V)")
+yyaxis left;
+plot(charge_injection.artifact.Time_s, charge_injection.artifact.X4_V * 1e6, "Color", "#33bbee");
+ylabel("Artifact voltage (μV)")
+xlabel("Time (s)")
