@@ -236,8 +236,6 @@ yticks([-1:0.5:1])
 nexttile()
 yyaxis left; plot(time_s*1e6, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)))); hold on
 ylabel("Filtered Victim (mV)")
-%ylim([-50, 50])
-%yticks([-50:25:50])
 yyaxis right; plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch2_V);
 ylim([-1.5, 1.5])
 yticks([-1.5:0.75:1.5])
