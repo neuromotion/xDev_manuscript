@@ -125,15 +125,20 @@ set(gcf, "Position", [500, 500, 560, 420])
 
 % All frequencies
 frequencies = string(fieldnames(time_domain_examples.square_waves.a8_v7));
+figure()
+tcl = tiledlayout(2, length(frequencies), "TileSpacing", "tight", "Padding", "tight");
 for i = 1:length(frequencies)
     this_frequency = split(frequencies(i), "f_"); this_frequency = this_frequency(2);
     this_frequency = split(this_frequency, "Hz"); this_frequency = str2double(this_frequency(1));
-    figure()
-    tcl = tiledlayout(2, 1, "TileSpacing", "tight");
     nexttile()
     plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V); hold on
     plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch2_V);
     ylabel("Voltage (V)")
+    title(sprintf("%d Hz", this_frequency))
+end
+for i = 1:length(frequencies)
+    this_frequency = split(frequencies(i), "f_"); this_frequency = this_frequency(2);
+    this_frequency = split(this_frequency, "Hz"); this_frequency = str2double(this_frequency(1));
     nexttile()
     yyaxis left; plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V .* 1000);
     ylabel("Victim (mV)")
@@ -144,9 +149,9 @@ for i = 1:length(frequencies)
     ylim([-1.5, 1.5])
     yticks([-1.5:0.75:1.5])
     xlabel("Time (μs)")
-    title(tcl, sprintf("Square wave crosstalk at %dHz", this_frequency));
-    set(gcf, "Position", [500, 500, 560, 420])
 end
+title(tcl, "Square wave crosstalk");
+set(gcf, "Position", [61, 426, 1852, 420])
 
 %% Calculate timeconstant
 
