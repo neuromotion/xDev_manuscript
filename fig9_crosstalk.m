@@ -194,6 +194,7 @@ end
 xlim([-5e-1, 25e-1])
 xlabel("Time (µs)")
 ylabel("Victim (mV)")
+yticks([-60:30:60])
 title("Square wave crosstalk artifact vs frequency")
 legend(strrep(frequencies, "f_", ""), "Location", "EastOutside")
 set(gcf, "Position", [61, 426, 706, 420])
