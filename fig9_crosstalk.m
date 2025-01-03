@@ -95,3 +95,87 @@ ylabel("Aggressor (V)")
 xlabel("Time (ms)")
 title("10000Hz Crosstalk")
 set(gcf, "Position", [100, 100, 560, 420])
+
+%% Square wave examples
+
+% Single example
+time_s = time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s - time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s(1);
+figure()
+tcl = tiledlayout(2, 1, "TileSpacing", "tight");
+nexttile()
+plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V); hold on
+plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch2_V);
+ylabel("Voltage (V)")
+ylim([-1.1, 1.1])
+yticks([-1:0.5:1])
+nexttile()
+yyaxis left; plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V .* 1000);
+ylabel("Victim (mV)")
+ylim([-50, 50])
+yticks([-50:25:50])
+yyaxis right; plot(time_s*1e6, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch2_V);
+ylim([-1.5, 1.5])
+yticks([-1.5:0.75:1.5])
+ylabel("Aggressor (V)")
+xlabel("Time (μs)")
+xlim([0, 200])
+xticks([0:50:200])
+title(tcl, "Square wave crosstalk at 10kHz")
+set(gcf, "Position", [500, 500, 560, 420])
+
+% All frequencies
+frequencies = string(fieldnames(time_domain_examples.square_waves.a8_v7));
+for i = 1:length(frequencies)
+    this_frequency = split(frequencies(i), "f_"); this_frequency = this_frequency(2);
+    this_frequency = split(this_frequency, "Hz"); this_frequency = str2double(this_frequency(1));
+    figure()
+    tcl = tiledlayout(2, 1, "TileSpacing", "tight");
+    nexttile()
+    plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V); hold on
+    plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch2_V);
+    ylabel("Voltage (V)")
+    nexttile()
+    yyaxis left; plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V .* 1000);
+    ylabel("Victim (mV)")
+    ylim([-50, 50])
+    yticks([-50:25:50])
+    yyaxis right; plot(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(1), time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch2_V);
+    ylabel("Aggressor (V)")
+    ylim([-1.5, 1.5])
+    yticks([-1.5:0.75:1.5])
+    xlabel("Time (μs)")
+    title(tcl, sprintf("Square wave crosstalk at %dHz", this_frequency));
+    set(gcf, "Position", [500, 500, 560, 420])
+end
+
+%% Calculate timeconstant
+
+frequencies = string(fieldnames(time_domain_examples.square_waves.a8_v7));
+freq_num = nan(length(frequencies), 1);
+tc = nan(size(freq_num));
+
+figure()
+tcl = tiledlayout(length(frequencies), 1, "TileSpacing", "tight");
+for i = 1:length(frequencies)-2 % not using last 2 frequencies, as half-period is shorter than time constant
+    this_frequency = split(frequencies(i), "f_"); this_frequency = this_frequency(2);
+    this_frequency = split(this_frequency, "Hz"); this_frequency = str2double(this_frequency(1));
+    [v0, peak_idx] = max(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V(1:round(length(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V)/4*3)));
+    t1_lvl = v0 / exp(1);
+    tc_idx = find(time_domain_examples.square_waves.a8_v7.(frequencies(i)).Ch1_V <= t1_lvl & time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s >= time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(peak_idx), 1);
+    freq_num(i) = this_frequency;
+    tc(i) = time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(tc_idx) - time_domain_examples.square_waves.a8_v7.(frequencies(i)).Time_s(peak_idx);
+    
+end
+
+fprintf("Time constant for square wave transient artifact is %f microseconds\n", nanmean(tc) * 1e6)
+
+%% Filtering victim channel for 30kHz recording
+
+figure()
+tcl = tiledlayout(2, 1, "TileSpacing", "tight");
+nexttile()
+plot(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V); hold on
+plot(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)), "Steepness", 0.95, "StopbandAttenuation", 95));
+nexttile()
+yyaxis left; plot(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s, time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V);
+yyaxis right; plot(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s, lowpass(time_domain_examples.square_waves.a8_v7.f_10000Hz.Ch1_V, 15e3, 1/nanmean(diff(time_domain_examples.square_waves.a8_v7.f_10000Hz.Time_s)), "Steepness", 0.95, "StopbandAttenuation", 95));
