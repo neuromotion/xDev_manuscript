@@ -184,3 +184,49 @@ set(gcf, "Position", [345, 357, 333, 420])
 
 p = kruskalwallis([reshape(abs(input_output_error_xdev), [], 1), reshape(abs(input_output_error_no_xdev), [], 1)], [], "off");
 subtitle(sprintf("p = %0.4f | n = %d", p, numel(input_output_error_xdev)));
+
+%% Plot average spike from neuroDAC and original data
+
+load("data\original_spikes.mat")
+load("data\neuroDAC_spikes.mat")
+nd_mean = mean(nd_spike_waveforms); nd_std = std(nd_spike_waveforms);
+nd_time = linspace(0, (size(nd_spike_waveforms, 2)-1)/30e3, size(nd_spike_waveforms, 2));
+orig_mean = mean(orig_spike_waveforms); orig_std = std(orig_spike_waveforms);
+orig_time = linspace(0, (size(orig_spike_waveforms, 2)-1)/30e3, size(orig_spike_waveforms, 2));
+
+figure()
+tcl = tiledlayout(1, 2, "TileSpacing", "tight");
+ax(1) = nexttile();
+c1 = nd_mean + nd_std;
+c2 = nd_mean - nd_std;
+t2 = [nd_time, fliplr(nd_time)];
+a1 = [c1, fliplr(c2)];
+h = fill(t2*1000, a1, 'k'); hold on
+set(h, 'facealpha', 0.5);
+set(h, 'facecolor', '#33bbee');
+plot(nd_time*1000, nd_mean, 'LineWidth', 2, "Color", "#262626");
+ylabel("Voltage (mV)")
+xlabel("Time (ms)")
+xlim([0, 5.5])
+xticks(0:1:5)
+legend("Standard Deviation", "Mean", "Location", "Northeast")
+title("NeuroDAC output")
+
+ax(2) = nexttile();
+c1 = orig_mean + orig_std;
+c2 = orig_mean - orig_std;
+t2 = [orig_time, fliplr(orig_time)];
+a1 = [c1, fliplr(c2)];
+h = fill(t2*1000, a1, 'k'); hold on
+set(h, 'facealpha', 0.5);
+set(h, 'facecolor', '#33bbee');
+plot(orig_time*1000, orig_mean, 'LineWidth', 2, "Color", "#262626");
+legend("Standard Deviation", "Mean", "Location", "Northeast")
+title("Original file")
+xlabel("Time (ms)")
+xlim([0, 5.5])
+xticks(0:1:5)
+linkaxes(ax, 'xy');
+title(tcl, "NeuroDAC Performance Assessment")
+
+set(gcf, "Position", [300, 300, 1254, 420])
