@@ -58,16 +58,55 @@ title(tcl, "Charge Injection")
 set(gcf, "Position", [100, 100, 1310, 420])
 
 %% Plot artifact on ephys channel
+r_vals_k = [1, 10, 100];
 
-figure()
-yyaxis right;
-plot(charge_injection.artifact.Time_s * 1e6, charge_injection.artifact.PCLK_V, '-', "Color", "#000000");
-ylabel("PCLK Voltage (V)")
-yticks(0:2.5:5)
-yyaxis left;
-plot(charge_injection.artifact.Time_s * 1e6, charge_injection.artifact.X4_V * 1e6, "Color", "#33bbee");
-ylabel("Artifact voltage (μV)")
-ylim([-400, 400])
-yticks(-400:200:400)
-xlabel("Time (μs)")
-title("Charge injection artifact into 1k electrode impedance")
+figure("Renderer","painters");
+tcl = tiledlayout(1, 3, "TileSpacing", "tight");
+for i = 1:length(r_vals_k)
+    nexttile()
+    yyaxis left;
+    plotMeanAndStandard(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us', charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).PCLK_V', "#262626", "#262626");
+    ylabel("PCLK (V)")
+    yyaxis right
+    plotMeanAndStandard(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us', charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).CH_4_uV', "#33bbee", "#33bbee");
+    ylabel("Charge Injection Artifact (uV)")
+    xlabel("Time (us)")
+    title(sprintf("Electrode Z = %dR", r_vals_k(i)))
+end
+set(gcf, "Position", [63, 1, 1858, 1123]);
+
+figure("Renderer","painters");
+colors = ["#cc3311", "#009988", "#33bbee"];
+for i = 1:length(r_vals_k)
+    charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Current_uA = charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).CH_4_uV ./ (r_vals_k(i) * 1000);
+    plotMeanAndStandard(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us', charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Current_uA' .* 1000, colors(i), colors(i)); hold on
+end
+plot([0, 0], [-10, 20], "--", "Color", "#888888");
+title("All")
+ylabel("Injected Current (nA)")
+xlabel("Time (us)")
+yticks(-10:10:20);
+xticks(0:60:120);
+ylim([-10, 20]);
+xlim([min(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us, [], 'all'), max(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us, [], 'all')]);
+legend("R = 1k", "R = 10k", "R = 100k", "Connection made", "Location", "northeast")
+
+%% Functions
+
+function plotMeanAndStandard(time, data_mat, lineColor, fillColor)
+    data_mean = nanmean(data_mat);
+    data_std = nanstd(data_mat);
+    time = nanmean(time);
+
+    mask = ~isnan(time) & ~isnan(data_mean) & ~isnan(data_std);
+    time = time(mask);
+    data_mean = data_mean(mask);
+    data_std = data_std(mask);
+
+    curve1 = data_mean + data_std;
+    curve2 = data_mean - data_std;
+    x2 = [time, fliplr(time)];
+    inBetween = [curve1,  fliplr(curve2)];
+    fill(x2, inBetween, 'g', "FaceColor", fillColor, "LineStyle", "none", "FaceAlpha", 0.5, "HandleVisibility", "off"); hold on
+    plot(time, data_mean, '-', 'Color', lineColor, 'LineWidth', 2);
+end
