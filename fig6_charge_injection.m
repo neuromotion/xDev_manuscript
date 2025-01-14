@@ -76,7 +76,7 @@ end
 set(gcf, "Position", [63, 1, 1858, 1123]);
 
 figure("Renderer","painters");
-colors = ["#cc3311", "#009988", "#33bbee"];
+colors = ["#06d6a0", "#b04cb9", "#33bbee"];
 for i = 1:length(r_vals_k)
     charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Current_uA = charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).CH_4_uV ./ (r_vals_k(i) * 1000);
     plotMeanAndStandard(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us', charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Current_uA' .* 1000, colors(i), colors(i)); hold on
@@ -84,7 +84,7 @@ end
 plot([0, 0], [-10, 20], "--", "Color", "#888888");
 title("All")
 ylabel("Injected Current (nA)")
-xlabel("Time (us)")
+xlabel("Time (μs)")
 yticks(-10:10:20);
 xticks(0:60:120);
 ylim([-10, 20]);
