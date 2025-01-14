@@ -71,7 +71,7 @@ for i = 1:length(r_vals_k)
     plotMeanAndStandard(charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).Time_us', charge_injection.artifact.(sprintf("R%dk", r_vals_k(i))).CH_4_uV', "#33bbee", "#33bbee");
     ylabel("Charge Injection Artifact (uV)")
     xlabel("Time (us)")
-    title(sprintf("Electrode Z = %dR", r_vals_k(i)))
+    title(sprintf("Electrode Z = %dR", r_vals_k(i)*1000))
 end
 set(gcf, "Position", [63, 1, 1858, 1123]);
 
