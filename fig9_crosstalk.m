@@ -1,11 +1,16 @@
 %% fig9_crosstalk.m
 % Author: Sam Parker
-% Date: 8/16/2024
+% Date: 1/22/2025
 % (C) Brown Neuromotion Lab 2024
 %
 % PROVIDED WITHOUT WARRANTY OR GUARANTEE
 clear; close all; clc
 load("data\Fig9_crosstalk.mat")
+
+color_theme = [51, 188, 238;
+               136, 136, 136] ./ 255;
+c_map = [linspace(color_theme(2, 1), color_theme(1, 1), 512)', linspace(color_theme(2, 2), color_theme(1, 2), 512)', linspace(color_theme(2, 3), color_theme(1, 3), 512)'];
+
 
 %% Calculate amplifier gain in dB
 
@@ -268,3 +273,79 @@ xlim([0, 45])
 title(tcl, "Crosstalk after antialiasing - autoscale")
 set(gcf, "Position", [500, 500, 560, 420])
 
+%% Plot surface of crosstalk vs separation
+
+freq_vect = attenuation_vs_separation.a0_v10.freq;
+names = string(fieldnames(attenuation_vs_separation));
+Z = nan(length(names), length(freq_vect));
+distances = nan(length(names), 1);
+for i = 1:length(names)
+    gates = split(string(split(names(i))), "a"); gates = gates(2);
+    gates = split(gates, "_");
+    agg_gate = str2double(gates(1)); 
+    gates = split(gates(2), "v");
+    vic_gate = str2double(gates(2));
+    distances(i) = abs(agg_gate - vic_gate);
+    idxs = find(any(attenuation_vs_separation.(names(i)).freq == freq_vect, 2));
+    Z(i, :) = attenuation_vs_separation.(names(i)).attenuation_db(idxs);
+end
+
+unique_distances = unique(distances, "stable");
+for dist_idx = 1:length(unique_distances)
+    mask = distances == unique_distances(dist_idx);
+    if sum(mask) == 1
+        continue
+    end
+    rows = find(mask);
+    Z(rows(1), :) = mean(Z(rows, :));
+    Z(rows(2:end), :) = [];
+end
+
+[unique_distances, I] = sort(unique_distances);
+Z = Z(I, :);
+
+figure("Renderer", "painters")
+s = surf(freq_vect,unique_distances,  Z);
+xscale("log")
+zlabel("Attenuation (dB)")
+ylabel("Separation (num channels)")
+xlabel("Aggressor frequency (Hz)")
+s.EdgeColor = "#000000";
+s.FaceColor = 'flat';
+s.FaceLighting = 'flat';
+clim([50, 95])
+colormap(c_map)
+view([42, 11])
+while(~all(get(gcf, "Position") == [1, 1, 1854, 1123]))
+    set(gcf, "Position", [1, 1, 1854, 1123]);
+    drawnow
+end
+
+%% Check correlation
+
+ylims = [80, 100;
+        80, 100;
+        60, 80;
+        50, 70;
+        40, 60;
+        25, 55];
+
+figure()
+tcl = tiledlayout(2, 3, "TileSpacing", "tight");
+for i = 1:size(Z, 2)
+nexttile()
+mdl = fitlm(unique_distances, Z(:, i));
+pearson_cor = corrcoef(unique_distances, Z(:, i));
+pearson_cor = pearson_cor(1, 2);
+plot(mdl)
+xlabel("Separation (channels)")
+ylabel("Attenuation (dB)")
+title(sprintf("%d Hz", freq_vect(i)));
+subtitle(sprintf("p = %0.4f | R = %0.4f", mdl.ModelFitVsNullModel.Pvalue, pearson_cor))
+xlim([0, 16])
+ylim(ylims(i, :));
+end
+while(~all(get(gcf, "Position") == [1, 1, 1854, 1123]))
+    set(gcf, "Position", [1, 1, 1854, 1123]);
+    drawnow
+end
