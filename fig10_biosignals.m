@@ -115,7 +115,7 @@ end
 if any(p_vals < 0.05)
     fprintf("Found statistically significant difference in %s band in Sheep EMG!\n", biosignals.baseline.sheep_emg.power_in_band.band_names(p_vals < 0.05))
 else
-    disp("No differences in band power for Sheep LFP")
+    disp("No differences in band power for Sheep EMG")
 end
 
 %% Plot NHP cortical spike raster plot
