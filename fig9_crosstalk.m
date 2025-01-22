@@ -41,7 +41,7 @@ ylim([20, 100])
 
 %% Plot time-domain examples
 
-f_list = string(fieldnames(time_domain_examples));
+f_list = string(fieldnames(time_domain_examples)); f_list(end) = [];
 f_list = split(f_list, "_"); f_list(:, 1) = [];
 f_list = split(f_list, "Hz"); f_list(:, 2) = [];
 f_list = double(f_list);
